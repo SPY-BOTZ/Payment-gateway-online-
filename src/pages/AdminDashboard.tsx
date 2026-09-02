@@ -8,6 +8,8 @@ export default function AdminDashboard() {
   const [kycQueue, setKycQueue] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   useEffect(() => {
     fetchAdminData();
@@ -37,6 +39,21 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error("Failed to update KYC", err);
       alert("Failed to update KYC status");
+    }
+  };
+
+  const handleBroadcast = async () => {
+    if (!broadcastMessage.trim()) return;
+    setIsBroadcasting(true);
+    try {
+      const res = await axios.post('/api/admin/broadcast', { message: broadcastMessage });
+      alert(res.data.message || "Broadcast sent successfully!");
+      setBroadcastMessage("");
+    } catch (err) {
+      console.error("Broadcast failed", err);
+      alert("Failed to send broadcast");
+    } finally {
+      setIsBroadcasting(false);
     }
   };
 
@@ -70,6 +87,26 @@ export default function AdminDashboard() {
             <div className="flex items-end">
               <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm transition-colors">
                 Save Channel Config
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h4 className="text-md font-bold text-gray-900 dark:text-white mb-2">Broadcast Message</h4>
+            <div className="flex gap-4">
+              <textarea
+                value={broadcastMessage}
+                onChange={(e) => setBroadcastMessage(e.target.value)}
+                placeholder="Write a message to broadcast to all Telegram-linked users..."
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none"
+                rows={2}
+              ></textarea>
+              <button 
+                onClick={handleBroadcast}
+                disabled={isBroadcasting || !broadcastMessage.trim()}
+                className="px-6 py-2 bg-indigo-600 disabled:bg-gray-400 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center min-w-[120px]"
+              >
+                {isBroadcasting ? "Sending..." : "Send"}
               </button>
             </div>
           </div>

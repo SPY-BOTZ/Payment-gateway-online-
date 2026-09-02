@@ -10,6 +10,7 @@ import { Membership, TelegramInvite } from "../models/Membership.js";
 import { Wallet, Transaction } from "../models/Wallet.js";
 import { requireAuth } from "../middleware/auth.js";
 import { dbStore, OrderData, MembershipData } from "../db/store.js";
+import { sendTelegramNotification } from "../utils/telegramAlerts.js";
 
 const router = express.Router();
 const isMongooseConnected = () => mongoose.connection.readyState === 1;
@@ -157,6 +158,12 @@ router.post("/verify", requireAuth, async (req, res) => {
       });
       await membership.save();
 
+      // Send Real-time notification to user
+      await sendTelegramNotification(
+        userId, 
+        `🎉 <b>Payment Successful!</b>\n\nYour subscription for <b>${product.name}</b> has been activated.\nOrder ID: <code>${order._id}</code>\nAmount Paid: ₹${order.amount}\n\nThank you for choosing SPY Botz!`
+      );
+
       // Telegram Invite Link Generation
       let inviteLink = `https://t.me/+SPYVIP_${Date.now().toString(36).toUpperCase()}`;
       if (process.env.TELEGRAM_BOT_TOKEN && product.telegramChannelId) {
@@ -300,6 +307,13 @@ router.post("/verify", requireAuth, async (req, res) => {
           `Payment of ₹${order.amount} for ${order.productName} verified. Your PRIVATE VIP Telegram invite: ${inviteLink} (WARNING: This link expires when your membership expires and can only be used by 1 person.)`,
           currentUser._id
         );
+        
+        // Send Real-time notification to user
+        await sendTelegramNotification(
+          userId, 
+          `🎉 <b>Payment Successful!</b>\n\nYour subscription for <b>${order.productName || 'Product'}</b> has been activated.\nOrder ID: <code>${order._id}</code>\nAmount Paid: ₹${order.amount}\n\nThank you for choosing SPY Botz!`
+        );
+        
         dbStore.dispatchNotification(
           "MEMBERSHIP_ACTIVATED",
           "EMAIL",
