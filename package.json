@@ -4,10 +4,10 @@
   "description": "Payment Gateway Project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "echo 'No build required'"
   },
   "dependencies": {
     "express": "^4.19.2"
   }
 }
-
