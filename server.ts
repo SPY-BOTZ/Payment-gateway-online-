@@ -11,6 +11,7 @@ dotenv.config();
 
 // We will import routes here
 import apiRoutes from "./server/routes.js";
+import { initCronJobs } from "./server/cron/subscription.js";
 
 async function startServer() {
   const app = express();
@@ -59,6 +60,9 @@ async function startServer() {
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    
+    // Initialize background cron jobs
+    initCronJobs();
   });
 }
 

@@ -1,14 +1,44 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, Send } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const botUsername = "SPY_Botz_Bot"; // Should ideally come from env, but can be hardcoded for UI placeholder
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile & KYC</h1>
       
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold flex items-center gap-2 mb-1">
+            <Send className="w-5 h-5 text-blue-500" />
+            Telegram Integration
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {user?.telegramChatId 
+              ? "Your Telegram account is linked successfully. You will receive private invites and notifications directly." 
+              : "Link your Telegram account to receive private invites, alerts, and priority support."}
+          </p>
+        </div>
+        {!user?.telegramChatId ? (
+          <a
+            href={`https://t.me/${botUsername}?start=${user?._id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors inline-flex items-center gap-2"
+          >
+            <Send className="w-4 h-4" />
+            Link Telegram Now
+          </a>
+        ) : (
+          <span className="px-4 py-2 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg font-bold flex items-center gap-2">
+            Linked Successfully
+          </span>
+        )}
+      </div>
+
       <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-bold mb-4">Personal Details</h2>
         <div className="space-y-3">
